@@ -20,6 +20,7 @@ class Cell:
         manhattan_distance = abs(agent_row - self.row) + abs(agent_column - self.column)
 
         self.g_value = manhattan_distance
+        self.update_f_value()
 
     def set_h_value(self, target_coordinate):
         # Pull Row and Column for target from tuple
@@ -31,7 +32,7 @@ class Cell:
 
         self.h_value = manhattan_distance
 
-    def set_f_value(self):
+    def update_f_value(self):
         self.f_value = self.g_value+self.h_value
 
     def get_coordinate(self):
@@ -49,5 +50,3 @@ class Cell:
 
     def get_f_value(self):
         return self.f_value
-
-
