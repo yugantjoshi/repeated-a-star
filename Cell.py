@@ -1,12 +1,52 @@
-class Cell:
 
-    def __init__(self, row, column):
-        self.row = row
-        self.column = column
+class Cell():
+
+    def __init__(self, row, col, width):
+
+        self.row = row * width
+        self.col = col * width
+
+        self.visited = False
+        self.current = False
+
         self.is_blocked = False
+
         self.g_value = -1
         self.h_value = -1
         self.f_value = -1
+
+        self.walls = [True, True, True, True]  # top , right , bottom , left
+
+        # neighbors
+        self.neighbors = []
+
+        self.top = 0
+        self.right = 0
+        self.bottom = 0
+        self.left = 0
+
+        self.next_cell = 0
+
+    def set_top(self, top):
+        self.top = top
+
+    def set_bottom(self, bottom):
+        self.bottom = bottom
+
+    def set_right(self, right):
+        self.right = right
+
+    def set_left(self, left):
+        self.left = left
+
+    def set_neighbors(self, neighbors):
+        self.neighbors = neighbors
+
+    def set_visited(self, isVisited):
+        self.visited = isVisited
+
+    def set_current(self, isCurrent):
+        self.current = isCurrent
 
     def set_is_blocked(self, is_blocked):
         self.is_blocked = is_blocked
@@ -33,10 +73,22 @@ class Cell:
         self.h_value = manhattan_distance
 
     def update_f_value(self):
-        self.f_value = self.g_value+self.h_value
+        self.f_value = self.g_value + self.h_value
 
     def get_coordinate(self):
         return self.row, self.column
+
+    def get_visited(self):
+        return self.visited
+
+    def get_current(self):
+        return self.current
+
+    def get_row(self):
+        return self.row
+
+    def get_column(self):
+        return self.col
 
     def get_is_blocked(self):
         return self.is_blocked
@@ -50,3 +102,18 @@ class Cell:
 
     def get_f_value(self):
         return self.f_value
+
+    def get_neighbors(self):
+        return self.neighbors
+
+    def get_top(self):
+        return self.top
+
+    def get_bottom(self):
+        return self.bottom
+
+    def get_right(self):
+        return self.right
+
+    def get_left(self):
+        return self.left
