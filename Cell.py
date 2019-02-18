@@ -76,7 +76,7 @@ class Cell():
         self.f_value = self.g_value + self.h_value
 
     def get_coordinate(self):
-        return self.row, self.column
+        return self.row, self.col
 
     def get_visited(self):
         return self.visited

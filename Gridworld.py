@@ -8,12 +8,12 @@ def create_maze():
 
     #Colors
     WHITE = (255, 255, 255)
-    GREY = (20, 20, 20)
+    GRAY = (20, 20, 20)
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
 
     # Screen Settings
-    screen_size = (700,700)
+    screen_size = (700, 700)
     WIDTH = 70
     screen = pygame.display.set_mode(screen_size)
 
@@ -26,16 +26,22 @@ def create_maze():
     cell_stack = []
 
     def draw(cell):
-        if cell.get_current == True:
+        if cell.get_current:
+            pygame.draw.rect(screen, RED, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
+        elif cell.get_visited():
             choice = np.random.choice(['unblocked', 'blocked'],
-                             1,
-                             p=[0.3, 0.7])
+                                 1,
+                                 p=[0.3, 0.7])
             print(choice)
-
+            if choice == 'blocked':
+                pygame.draw.rect(screen, BLACK, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
+            elif choice == 'unblocked':
+                pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
 
 
     def check_neighbors(cell):
-        pass
+        if int(cell.get_column() / WIDTH) - 1 >= 0:
+            cell.set_top(gridworld[int(cell.get_column() / WIDTH) - 1][int(cell.get_row() / WIDTH)])
 
     def remove_walls(current_cell, next_cell):
         pass
@@ -47,7 +53,6 @@ def create_maze():
         for x in range(num_cols):
             cell = Cell(x,y, WIDTH)
             gridworld[y].append(cell)
-            print(cell.get_coordinate())
 
     current_cell = gridworld[0][0]
     next_cell = 0
@@ -57,10 +62,9 @@ def create_maze():
             if e.type == pygame.QUIT:
                 done = True
 
-        screen.fill(GREY)
+        screen.fill(GRAY)
 
         # Mark visited and current
-        print(current_cell)
         current_cell.set_visited(True)
         current_cell.set_current(True)
 
@@ -79,7 +83,7 @@ def create_maze():
             # add current cell to stack
             cell_stack.append(current_cell)
             # Remove walls
-            remove_walls(current_cell, next_cell)
+            # remove_walls(current_cell, next_cell)
             # Go to next cell
             current_cell.set_current(False)
             current_cell = next_cell
