@@ -42,6 +42,9 @@ class Cell():
     def set_neighbors(self, neighbors):
         self.neighbors = neighbors
 
+    def add_neighbor(self, s):
+        self.neighbors.append(s)
+
     def set_visited(self, isVisited):
         self.visited = isVisited
 
@@ -50,6 +53,9 @@ class Cell():
 
     def set_is_blocked(self, is_blocked):
         self.is_blocked = is_blocked
+
+    def set_next_cell(self, cell):
+        self.next_cell = cell
 
     def set_g_value(self, agent_coordinate):
         # Pull Row and Column for agent from tuple
@@ -105,6 +111,12 @@ class Cell():
 
     def get_neighbors(self):
         return self.neighbors
+
+    def get_neighbor(self, i):
+        return self.neighbors[i]
+
+    def get_next_cell(self):
+        return self.next_cell
 
     def get_top(self):
         return self.top
