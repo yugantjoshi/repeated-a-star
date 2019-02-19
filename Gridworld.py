@@ -29,6 +29,7 @@ def create_maze():
         if cell.get_current:
             pygame.draw.rect(screen, RED, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
         elif cell.get_visited():
+            pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
             choice = np.random.choice(['unblocked', 'blocked'],
                                  1,
                                  p=[0.3, 0.7])
@@ -40,9 +41,51 @@ def create_maze():
 
 
     def check_neighbors(cell):
-        if int(cell.get_column() / WIDTH) - 1 >= 0:
-            cell.set_top(gridworld[int(cell.get_column() / WIDTH) - 1][int(cell.get_row() / WIDTH)])
 
+        # Top
+        if int(cell.get_column() / WIDTH) - 1 >= 0:
+            gridworld_x = (cell.get_column() / WIDTH) - 1
+            gridworld_y = (cell.get_row() / WIDTH)
+
+            cell.set_top(gridworld[int(gridworld_x)][int(gridworld_y)])
+        # Right
+        if int(cell.get_row() / WIDTH) + 1 <= num_cols - 1:
+            gridworld_x = (cell.get_column() / WIDTH)
+            gridworld_y = (cell.get_row() / WIDTH) + 1
+            cell.set_right(gridworld[int(gridworld_x)][int(gridworld_y)])
+        # Bottom
+        if int(cell.get_column() / WIDTH) + 1 <= num_rows - 1:
+            gridworld_x = (cell.get_column() / WIDTH) + 1
+            gridworld_y = (cell.get_row() / WIDTH)
+            cell.set_bottom(gridworld[int(gridworld_x)][int(gridworld_y)])
+        # Left
+        if int(cell.get_row() / WIDTH) - 1 >= 0:
+            gridworld_x = (cell.get_column() / WIDTH)
+            gridworld_y = (cell.get_row() / WIDTH) - 1
+            cell.set_left(gridworld[int(gridworld_x)][int(gridworld_y)])
+
+        # Top
+        if cell.get_top() != 0:
+            if cell.get_top().get_visited() == False:
+                cell.add_neighbor(cell.get_top())
+        # Right
+        if cell.get_right() != 0:
+            if cell.get_right().get_visited() == False:
+                cell.add_neighbor(cell.get_right())
+        # Bottom
+        if cell.get_bottom() != 0:
+            if cell.get_bottom().get_visited() == False:
+                cell.add_neighbor(cell.get_bottom())
+        # Left
+        if cell.get_left() != 0:
+            if cell.get_left().get_visited() == False:
+                cell.add_neighbor(cell.get_left())
+
+        if len(cell.get_neighbors()) > 0:
+            cell.set_next_cell(cell.get_neighbor(random.randrange(0,len(cell.get_neighbors()))))
+            return cell.get_next_cell()
+        else:
+            return False
     def remove_walls(current_cell, next_cell):
         pass
 
