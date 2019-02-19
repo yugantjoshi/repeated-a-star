@@ -18,6 +18,7 @@ def create_maze():
     screen = pygame.display.set_mode(screen_size)
 
     done = False
+    clock = pygame.time.Clock()
 
     # Num cols and rows based on screen size and width
     num_rows = int(screen_size[1] / WIDTH)
@@ -137,5 +138,6 @@ def create_maze():
             current_cell = cell_stack.pop()
 
         pygame.display.flip()
+        clock.tick(60)
 
 create_maze()
