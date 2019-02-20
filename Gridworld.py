@@ -11,10 +11,11 @@ def create_maze():
     GRAY = (20, 20, 20)
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
+    GREEN = (124,252,0)
 
     # Screen Settings
     screen_size = (700, 700)
-    WIDTH = 7
+    WIDTH = 70
     screen = pygame.display.set_mode(screen_size)
 
     done = False
@@ -121,8 +122,6 @@ def create_maze():
 
                 num_chosen = random.choice(random_list)
 
-                print(x, y)
-
                 #top
                 if num_chosen == 1:
                     if x != 0:
@@ -143,42 +142,58 @@ def create_maze():
 
     next_cell = 0
 
+    count = 0
+
     while not done:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 done = True
 
-        screen.fill(GRAY)
+        if count == 0:
 
-        # Mark visited and current
-        current_cell.set_visited(True)
-        current_cell.set_current(True)
+            screen.fill(GRAY)
 
-        # Draw for current cell
-        for y in range(num_rows):
-            for x in range(num_cols):
-                draw2(gridworld[y][x])
+            # Mark visited and current
+            current_cell.set_visited(True)
+            current_cell.set_current(True)
+
+            # Draw for current cell
+            for y in range(num_rows):
+                for x in range(num_cols):
+                    draw2(gridworld[y][x])
 
 
-        # Get next cell to go to
-        next_cell = check_neighbors(current_cell)
+            # Get next cell to go to
+            next_cell = check_neighbors(current_cell)
 
-        # If next cell is valid
-        if next_cell != False:
-            # Clear neighbors list for new cell
-            current_cell.set_neighbors([])
-            # add current cell to stack
-            cell_stack.append(current_cell)
-            # Remove walls
-            # remove_walls(current_cell, next_cell)
-            # Go to next cell
-            current_cell.set_current(False)
-            current_cell = next_cell
+            # If next cell is valid
+            if next_cell != False:
+                # Clear neighbors list for new cell
+                current_cell.set_neighbors([])
+                # add current cell to stack
+                cell_stack.append(current_cell)
+                # Remove walls
+                # remove_walls(current_cell, next_cell)
+                # Go to next cell
+                current_cell.set_current(False)
+                current_cell = next_cell
 
-        # Pop new cell from remaining cells in stack
-        elif len(cell_stack) > 0:
-            current_cell.set_current(False)
-            current_cell = cell_stack.pop()
+            # Pop new cell from remaining cells in stack
+            elif len(cell_stack) > 0:
+                current_cell.set_current(False)
+                current_cell = cell_stack.pop()
+
+        if len(cell_stack) == 0:
+
+            if count == 0:
+
+                agent = random.choice(random.choice(gridworld))
+                pygame.draw.rect(screen, RED, (agent.get_row(), agent.get_column(), WIDTH, WIDTH))
+
+                target = random.choice(random.choice(gridworld))
+                pygame.draw.rect(screen, GREEN, (target.get_row(), target.get_column(), WIDTH, WIDTH))
+
+                count = 1
 
         pygame.display.flip()
         clock.tick(60)
