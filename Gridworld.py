@@ -114,26 +114,31 @@ def create_maze():
 
     for x in range(num_rows):
         for y in range(num_cols):
-            num_chosen = random.choice(random_list)
 
-            print(x, y)
+            num_chosen1 = random.choice(random_list)
 
-            #top
-            if num_chosen == 1:
-                if x != 0:
-                    gridworld[x - 1][y].set_is_blocked(True)
-            #bottom
-            elif num_chosen == 2:
-                if x < num_rows - 1:
-                    gridworld[x + 1][y].set_is_blocked(True)
-            #right
-            elif num_chosen == 3:
-                if y < num_cols - 1:
-                    gridworld[x][y + 1].set_is_blocked(True)
-            #left
-            elif num_chosen == 4:
-                if y != 0:
-                    gridworld[x][y - 1].set_is_blocked(True)
+            if num_chosen1 == 1:
+
+                num_chosen = random.choice(random_list)
+
+                print(x, y)
+
+                #top
+                if num_chosen == 1:
+                    if x != 0:
+                        gridworld[x - 1][y].set_is_blocked(True)
+                #bottom
+                elif num_chosen == 2:
+                    if x < num_rows - 1:
+                        gridworld[x + 1][y].set_is_blocked(True)
+                #right
+                elif num_chosen == 3:
+                    if y < num_cols - 1:
+                        gridworld[x][y + 1].set_is_blocked(True)
+                #left
+                elif num_chosen == 4:
+                    if y != 0:
+                        gridworld[x][y - 1].set_is_blocked(True)
 
 
     next_cell = 0
