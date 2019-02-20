@@ -14,7 +14,7 @@ def create_maze():
 
     # Screen Settings
     screen_size = (700, 700)
-    WIDTH = 70
+    WIDTH = 7
     screen = pygame.display.set_mode(screen_size)
 
     done = False
@@ -40,6 +40,14 @@ def create_maze():
             elif choice == 'unblocked':
                 pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
 
+    def draw2(cell):
+        if cell.get_is_blocked():
+            pygame.draw.rect(screen, BLACK, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
+        else:
+            pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
+
+
+
 
     def check_neighbors(cell):
 
@@ -47,7 +55,6 @@ def create_maze():
         if int(cell.get_column() / WIDTH) - 1 >= 0:
             gridworld_x = (cell.get_column() / WIDTH) - 1
             gridworld_y = (cell.get_row() / WIDTH)
-
             cell.set_top(gridworld[int(gridworld_x)][int(gridworld_y)])
         # Right
         if int(cell.get_row() / WIDTH) + 1 <= num_cols - 1:
@@ -69,6 +76,7 @@ def create_maze():
         if cell.get_top() != 0:
             if cell.get_top().get_visited() == False:
                 cell.add_neighbor(cell.get_top())
+                cell.get_top().get_visited()
         # Right
         if cell.get_right() != 0:
             if cell.get_right().get_visited() == False:
@@ -87,6 +95,8 @@ def create_maze():
             return cell.get_next_cell()
         else:
             return False
+
+
     def remove_walls(current_cell, next_cell):
         pass
 
@@ -99,6 +109,33 @@ def create_maze():
             gridworld[y].append(cell)
 
     current_cell = gridworld[0][0]
+
+    random_list = [1, 2, 3, 4]
+
+    for x in range(num_rows):
+        for y in range(num_cols):
+            num_chosen = random.choice(random_list)
+
+            print(x, y)
+
+            #top
+            if num_chosen == 1:
+                if x != 0:
+                    gridworld[x - 1][y].set_is_blocked(True)
+            #bottom
+            elif num_chosen == 2:
+                if x < num_rows - 1:
+                    gridworld[x + 1][y].set_is_blocked(True)
+            #right
+            elif num_chosen == 3:
+                if y < num_cols - 1:
+                    gridworld[x][y + 1].set_is_blocked(True)
+            #left
+            elif num_chosen == 4:
+                if y != 0:
+                    gridworld[x][y - 1].set_is_blocked(True)
+
+
     next_cell = 0
 
     while not done:
@@ -115,7 +152,8 @@ def create_maze():
         # Draw for current cell
         for y in range(num_rows):
             for x in range(num_cols):
-                draw(gridworld[y][x])
+                draw2(gridworld[y][x])
+
 
         # Get next cell to go to
         next_cell = check_neighbors(current_cell)
