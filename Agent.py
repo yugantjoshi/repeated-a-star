@@ -1,6 +1,3 @@
-import heapq
-
-
 class Agent:
 
     def __init__(self, row, column):
