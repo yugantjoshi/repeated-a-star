@@ -15,7 +15,7 @@ def create_maze():
 
     # Screen Settings
     screen_size = (700, 700)
-    WIDTH = 70
+    WIDTH = 7
     screen = pygame.display.set_mode(screen_size)
 
     done = False
@@ -163,7 +163,7 @@ def create_maze():
                     draw2(gridworld[y][x])
 
 
-            # Get next cell to go to
+            '''# Get next cell to go to
             next_cell = check_neighbors(current_cell)
 
             # If next cell is valid
@@ -181,7 +181,7 @@ def create_maze():
             # Pop new cell from remaining cells in stack
             elif len(cell_stack) > 0:
                 current_cell.set_current(False)
-                current_cell = cell_stack.pop()
+                current_cell = cell_stack.pop()'''
 
         if len(cell_stack) == 0:
 
