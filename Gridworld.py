@@ -39,7 +39,6 @@ def pick_next_cell(curr_cell, target_cell, width):
 
     return next_cell
 
-
 def create_maze(agent, target):
 
     #Colors
@@ -214,8 +213,10 @@ def create_maze(agent, target):
 
                 for y in range(num_rows):
                     for x in range(num_cols):
-                        gridworld[y][x].set_g_value(agent)
-                        gridworld[y][x].set_h_value(target)
+                        agent_coord = agent[0]/WIDTH, agent[1]/WIDTH
+                        target_coord = target[0]/WIDTH, target[0]/WIDTH
+                        gridworld[y][x].set_g_value(agent_coord)
+                        gridworld[y][x].set_h_value(target_coord)
                         gridworld[y][x].update_f_value()
 
                 count = 1
