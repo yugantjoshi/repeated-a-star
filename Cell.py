@@ -63,7 +63,7 @@ class Cell():
         agent_column = agent_coordinate[1]
 
         # Calculate Manhattan Distance for current cell
-        manhattan_distance = abs(agent_row - self.row) + abs(agent_column - self.column)
+        manhattan_distance = abs(agent_row - self.row) + abs(agent_column - self.col)
 
         self.g_value = manhattan_distance
         self.update_f_value()
@@ -74,7 +74,7 @@ class Cell():
         target_column = target_coordinate[1]
 
         # Calculate Manhattan Distance for current cell
-        manhattan_distance = abs(target_row - self.row) + abs(target_column - self.column)
+        manhattan_distance = abs(target_row - self.row) + abs(target_column - self.col)
 
         self.h_value = manhattan_distance
 

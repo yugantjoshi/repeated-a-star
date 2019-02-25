@@ -212,12 +212,20 @@ def create_maze(agent, target):
                 target = targetCell.get_row(), targetCell.get_column()
                 print(target)
 
+                for y in range(num_rows):
+                    for x in range(num_cols):
+                        gridworld[y][x].set_g_value(agent)
+                        gridworld[y][x].set_h_value(target)
+                        gridworld[y][x].update_f_value()
+
                 count = 1
 
         pygame.display.flip()
 
     curr_cell = agent
     end_cell = target
+
+
 
     '@Summary: This is the loop that is constantly running behind the scenes and updates the display'
     while not done:
