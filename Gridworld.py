@@ -4,14 +4,51 @@ import numpy as np
 from Cell import Cell
 
 
-def create_maze():
+
+def pick_next_cell(curr_cell, target_cell, width):
+
+    row = 0
+    col = 0
+
+    flag = True
+
+    if curr_cell == target_cell:
+        return curr_cell
+
+    if curr_cell[0] < target_cell[0]:
+        row = curr_cell[0] + width
+        col = curr_cell[1]
+        flag = False
+    elif curr_cell[0] > target_cell[0]:
+        row = curr_cell[0] - width
+        col = curr_cell[1]
+        flag = False
+    elif curr_cell[0] == target_cell[0]:
+        row = curr_cell[0]
+
+    if curr_cell[1] < target_cell[1] and flag:
+        col = curr_cell[1] + width
+        row = curr_cell[0]
+    elif curr_cell[1] > target_cell[1] and flag:
+        col = curr_cell[1] - width
+        row = curr_cell[0]
+    elif curr_cell[1] == target_cell[1]:
+        col = curr_cell[1]
+
+    next_cell = (row, col)
+
+    return next_cell
+
+
+def create_maze(agent, target):
 
     #Colors
     WHITE = (255, 255, 255)
-    GRAY = (20, 20, 20)
+    GRAY = (128, 128, 128)
     BLACK = (0, 0, 0)
-    RED = (255, 0, 0)
-    GREEN = (124,252,0)
+    RED = (178,34,34)
+    GREEN = (34,139,34)
+    BLUE = (0,191,255)
 
     # Screen Settings
     screen_size = (700, 700)
@@ -46,6 +83,7 @@ def create_maze():
             pygame.draw.rect(screen, BLACK, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
         else:
             pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
+
 
 
 
@@ -144,10 +182,8 @@ def create_maze():
 
     count = 0
 
-    while not done:
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
-                done = True
+    '@Summary: This loop generates the maze randomly and also sets the agent and target'
+    while count != 1:
 
         if count == 0:
 
@@ -162,40 +198,47 @@ def create_maze():
                 for x in range(num_cols):
                     draw2(gridworld[y][x])
 
-
-            '''# Get next cell to go to
-            next_cell = check_neighbors(current_cell)
-
-            # If next cell is valid
-            if next_cell != False:
-                # Clear neighbors list for new cell
-                current_cell.set_neighbors([])
-                # add current cell to stack
-                cell_stack.append(current_cell)
-                # Remove walls
-                # remove_walls(current_cell, next_cell)
-                # Go to next cell
-                current_cell.set_current(False)
-                current_cell = next_cell
-
-            # Pop new cell from remaining cells in stack
-            elif len(cell_stack) > 0:
-                current_cell.set_current(False)
-                current_cell = cell_stack.pop()'''
-
         if len(cell_stack) == 0:
 
             if count == 0:
 
-                agent = random.choice(random.choice(gridworld))
-                pygame.draw.rect(screen, RED, (agent.get_row(), agent.get_column(), WIDTH, WIDTH))
+                agentCell = random.choice(random.choice(gridworld))
+                pygame.draw.rect(screen, GREEN, (agentCell.get_row(), agentCell.get_column(), WIDTH, WIDTH))
+                agent = (agentCell.get_row(), agentCell.get_column())
+                print(agent)
 
-                target = random.choice(random.choice(gridworld))
-                pygame.draw.rect(screen, GREEN, (target.get_row(), target.get_column(), WIDTH, WIDTH))
+                targetCell = random.choice(random.choice(gridworld))
+                pygame.draw.rect(screen, RED, (targetCell.get_row(), targetCell.get_column(), WIDTH, WIDTH))
+                target = targetCell.get_row(), targetCell.get_column()
+                print(target)
 
                 count = 1
 
         pygame.display.flip()
-        clock.tick(60)
 
-create_maze()
+    curr_cell = agent
+    end_cell = target
+
+    '@Summary: This is the loop that is constantly running behind the scenes and updates the display'
+    while not done:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                done = True
+
+        '''As the agent Moves along the path update within this loop and color path that is taken'''
+
+        color_next_cell = pick_next_cell(curr_cell, end_cell, WIDTH)
+
+        if color_next_cell != target:
+            pygame.draw.rect(screen, BLUE, (color_next_cell[0], color_next_cell[1], WIDTH, WIDTH))
+
+        curr_cell = color_next_cell
+
+
+        pygame.display.flip()
+        pygame.time.delay(100)
+        #clock.tick(6000)
+
+agent = ()
+target = ()
+create_maze(agent, target)
