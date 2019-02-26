@@ -44,6 +44,10 @@ class Cell():
 
     def set_neighbors(self, neighbors):
         self.neighbors = neighbors
+        for n in neighbors:
+            n.set_g_value = self.g_value+1
+            self.update_f_value()
+
 
     def set_x(self, x):
         self.x = x
@@ -145,7 +149,7 @@ class Cell():
         # Return neighbor with the smallest f value
         minNeighbor = self.neighbors[0]
         for n in self.neighbors:
-            if not n.get_is_blocked():
+            if not n.get_visited():
                 if n.get_f_value() < minNeighbor.get_f_value():
                     if n.get_f_value() == minNeighbor.get_f_value():
                         # Tie Break

@@ -54,9 +54,16 @@ def forwardAStar(agent_initial_coord, target_coord, gridworld, tie):
 
         # Set neighbors list for that cell
         current_cell.set_neighbors(neighbors)
+
+        # Add all unblocked neighbors to open list
+        updated_neighbors = current_cell.get_neighbors()
+        for n in updated_neighbors:
+            if not n.get_is_blocked:
+                heap.heappush(openlist, n)
+
+        # TODO: Implement cell parent value
         # Take neighbor with smallest f value and add to open list
         next_cell = current_cell.get_best_neighbor(tie)
-        heap.heappush(openlist, next_cell)
 
 
 
