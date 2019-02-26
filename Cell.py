@@ -12,7 +12,7 @@ class Cell:
         self.f = 0
 
         self.neighbors = []
-        self.parent = ()
+        self.parent = None
 
     def set_neighbors(self, neighbors):
         self.neighbors = neighbors

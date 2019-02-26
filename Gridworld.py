@@ -1,7 +1,7 @@
 import pygame
 import random as rand
 import numpy as np
-import heapq as heap
+import heapq
 from Cell import Cell
 
 # Colors
@@ -16,7 +16,122 @@ screen_size = (707, 707)
 width = 7
 screen = pygame.display.set_mode(screen_size)
 
+open_list = []
+closed_list = []
+# gets a potential path from compute path (thru cell.parent)
+# constructs path until the first unblocked and resets the start position of agent
+# colors the path taken
+def constructPath(start_cell, target_cell):
+
+    print("ENTERED CONSTRUCTPATH", start_cell.x, start_cell.y)
+    path = []
+
+    path.append(target_cell)
+    path.reverse()
+    curr_cell = target_cell.parent
+    print("target parent", curr_cell.x, curr_cell.y)
+    while curr_cell is not start_cell:
+        print("parent", curr_cell.x, curr_cell.y)
+        path.append(curr_cell)
+        curr_cell = curr_cell.parent
+
+    path.append(start_cell)
+
+    print(path)
+    unblocked = []
+
+    for curr_cell in path:
+        if not curr_cell.blocked:
+            unblocked.append(curr_cell)
+            curr_cell.visited = True
+            pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
+            pygame.display.flip()
+        else:
+            break
+
+    return unblocked
+
+
+# essentially, we are getting the shortest path to target in this
+# starting with the start_state of the agent, it adds smallest-f cell to the path
+# with that cell it computes the rest of the path
+# until it reaches goal, where it actually constructs the path
+def computePath(start_cell, target_cell, gridworld):
+
+    print(start_cell.x, start_cell.y)
+    print(target_cell.x, target_cell.y)
+    closed_list = []
+    open_list = []
+    start_cell.g = 0
+    heapq.heappush(open_list, (start_cell.f, start_cell))
+
+    while(len(open_list) > 0):
+
+        curr_cell_tuple = heapq.heappop(open_list)
+        curr_cell = curr_cell_tuple[1]
+        print(curr_cell.x, curr_cell.y)
+
+
+        # goal reached by travelling through unexplored cells as well
+        # get_path is going to take care of the blocked cells in the path
+        if(curr_cell.x == target_cell.x and curr_cell.y == target_cell.y):
+            print("start", start_cell.x, start_cell.y)
+            print("target", target_cell.x, target_cell.y)
+            print("parent", curr_cell.parent.x, curr_cell.parent.y)
+            return constructPath(start_cell, curr_cell)
+
+        closed_list.append(curr_cell)
+
+        i = curr_cell.x
+        j = curr_cell.y
+        # Calculate all neighbors
+        neighbors = [gridworld[x[0]][x[1]] for x in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)] if
+                     x[0] >= 0 and x[1] >= 0 and x[0] < len(gridworld) and x[1] < len(gridworld[0])]
+
+        # Set neighbors list for that cell
+        curr_cell.set_neighbors(neighbors)
+        neighbors = curr_cell.neighbors
+
+        # adding the states to open_list
+        for cell in neighbors:
+            if cell.blocked or cell.visited:
+                continue
+            if cell in closed_list:
+                continue
+
+            # update value if already exists in open_list
+            for cell_tuple in open_list:
+                if cell_tuple[1] is cell:
+                    open_list.remove(cell_tuple)
+                    heapq.heapify(open_list)
+                    break
+
+            heapq.heappush(open_list,(cell.f, cell))
+
+            print(cell.x, cell.y)
+            #print(open_list)
+            cell.parent = curr_cell
+            print("parent ", cell.parent.x, cell.parent.y)
+
+    return None
+
+
 def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
+
+    while(1):
+        path = computePath(agent_initial_cell, target_cell, gridworld)
+
+        if path is None:
+            print("no path")
+            return
+
+
+        agent_initial_cell = path[len(path)-1]
+        print("new start ", agent_initial_cell.x, agent_initial_cell.y)
+        if agent_initial_cell.x == target_cell.x and agent_initial_cell.y == target_cell.y:
+            break
+
+    """
     # True tie means prefer gval, False means prefer hval
     openlist = []
     closedlist = []
@@ -61,7 +176,7 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
             pygame.display.flip()
         next_cell.parent = (current_cell.x, current_cell.y)
 
-
+    """
 
 def get_shortest_path(a_x, a_y, t_x, t_y, gridworld):
     '''start = gridworld[a_y][a_x]
