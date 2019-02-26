@@ -1,7 +1,59 @@
 import random
 import pygame
 import numpy as np
+import heapq as heap
 from Cell import Cell
+
+
+#Colors
+WHITE = (255, 255, 255)
+GRAY = (128, 128, 128)
+BLACK = (0, 0, 0)
+RED = (178,34,34)
+GREEN = (34,139,34)
+BLUE = (0,191,255)
+
+# Screen Settings
+screen_size = (700, 700)
+WIDTH = 7
+screen = pygame.display.set_mode(screen_size)
+
+
+def forwardAStar(agent_initial_coord, target_coord, gridworld, tie):
+    # True tie means prefer gval when choosing tied neighbors
+    # False tie means prefer hval when choosing tied neighbors
+
+    openlist = []
+    closedlist = []
+    start_cell = gridworld[agent_initial_coord[0]][agent_initial_coord[1]]
+
+    heap.heappush(openlist, (start_cell.get_f_value(), start_cell))
+
+    while len(openlist) > 0:
+
+        current_cell = heap.heappop(openlist)[1]
+
+        pygame.draw.rect(screen, BLUE, (current_cell.get_x(), current_cell.get_y(), WIDTH, WIDTH))
+
+        heap.heappush(closedlist, current_cell)
+        current_cell.set_visited(True)
+
+        if current_cell.get_x() == target_coord[0] and current_cell.get_y() == target_coord[1]:
+            return closedlist
+
+        # Look at neighbors neighbors
+        i = current_cell.get_x()
+        j = current_cell.get_y()
+
+        # Get all neighbors for current cell
+        neighbors = [gridworld[x[1]][x[0]] for x in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)] if
+                     x[0] >= 0 and x[1] >= 0 and x[0] < len(gridworld) and x[1] < len(gridworld[0])]
+
+        # Set neighbors list for that cell
+        current_cell.set_neighbors(neighbors)
+        # Take neighbor with smallest f value and add to open list
+        next_cell = current_cell.get_best_neighbor(tie)
+        heap.heappush(openlist, next_cell)
 
 
 
@@ -41,18 +93,6 @@ def pick_next_cell(curr_cell, target_cell, width):
 
 def create_maze(agent, target):
 
-    #Colors
-    WHITE = (255, 255, 255)
-    GRAY = (128, 128, 128)
-    BLACK = (0, 0, 0)
-    RED = (178,34,34)
-    GREEN = (34,139,34)
-    BLUE = (0,191,255)
-
-    # Screen Settings
-    screen_size = (700, 700)
-    WIDTH = 7
-    screen = pygame.display.set_mode(screen_size)
 
     done = False
     clock = pygame.time.Clock()
@@ -63,28 +103,11 @@ def create_maze(agent, target):
 
     cell_stack = []
 
-    def draw(cell):
-        if cell.get_current:
-            pygame.draw.rect(screen, RED, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
-        elif cell.get_visited():
-            pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
-            choice = np.random.choice(['unblocked', 'blocked'],
-                                 1,
-                                 p=[0.3, 0.7])
-            print(choice)
-            if choice == 'blocked':
-                pygame.draw.rect(screen, BLACK, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
-            elif choice == 'unblocked':
-                pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
-
     def draw2(cell):
         if cell.get_is_blocked():
             pygame.draw.rect(screen, BLACK, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
         else:
             pygame.draw.rect(screen, WHITE, (cell.get_row(), cell.get_column(), WIDTH, WIDTH))
-
-
-
 
 
     def check_neighbors(cell):
@@ -133,10 +156,6 @@ def create_maze(agent, target):
             return cell.get_next_cell()
         else:
             return False
-
-
-    def remove_walls(current_cell, next_cell):
-        pass
 
     #Create gridworld with cells
     gridworld = []
@@ -234,14 +253,19 @@ def create_maze(agent, target):
             if e.type == pygame.QUIT:
                 done = True
 
+        agent_coord = int(curr_cell[0] / WIDTH), int(curr_cell[1] / WIDTH)
+        target_coord = int(end_cell[0] / WIDTH), int(end_cell[1] / WIDTH)
+
+        forwardAStar(agent_coord, target_coord, gridworld, True)
+
         '''As the agent Moves along the path update within this loop and color path that is taken'''
 
-        color_next_cell = pick_next_cell(curr_cell, end_cell, WIDTH)
+        ''' color_next_cell = pick_next_cell(curr_cell, end_cell, WIDTH)
 
         if color_next_cell != target:
             pygame.draw.rect(screen, BLUE, (color_next_cell[0], color_next_cell[1], WIDTH, WIDTH))
 
-        curr_cell = color_next_cell
+        curr_cell = color_next_cell '''
 
 
         pygame.display.flip()

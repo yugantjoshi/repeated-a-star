@@ -6,6 +6,9 @@ class Cell():
         self.row = row * width
         self.col = col * width
 
+        self.x = row
+        self.y = col
+
         self.visited = False
         self.current = False
 
@@ -42,6 +45,14 @@ class Cell():
     def set_neighbors(self, neighbors):
         self.neighbors = neighbors
 
+    def set_x(self, x):
+        self.x = x
+    def set_y(self, y):
+        self.y = y
+    def get_x(self):
+        return self.x
+    def get_y(self):
+        return self.y
     def add_neighbor(self, s):
         self.neighbors.append(s)
 
@@ -129,3 +140,22 @@ class Cell():
 
     def get_left(self):
         return self.left
+
+    def get_best_neighbor(self, tie):
+        # Return neighbor with the smallest f value
+        minNeighbor = self.neighbors[0]
+        for n in self.neighbors:
+            if n.get_f_value() < minNeighbor.get_f_value():
+                if n.get_f_value == minNeighbor.get_f_value():
+                    # Tie Break
+                    if tie:  # use gval
+                        pass
+                    else:  # use hval
+                        pass
+                else:
+                    minNeighbor = n
+        return minNeighbor
+
+
+
+
