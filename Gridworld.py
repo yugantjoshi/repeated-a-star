@@ -13,7 +13,7 @@ GREEN = (0,250,154)
 BLUE = (0,191,255)
 
 screen_size = (707, 707)
-width = 7
+width = 50
 screen = pygame.display.set_mode(screen_size)
 
 open_list = []
@@ -44,8 +44,9 @@ def constructPath(start_cell, target_cell):
         if not curr_cell.blocked:
             unblocked.append(curr_cell)
             curr_cell.visited = True
-            pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
-            pygame.display.flip()
+            if curr_cell != start_cell and curr_cell != target_cell:
+                pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
+                pygame.display.update()
         else:
             break
 
@@ -178,6 +179,21 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
     """
 
+def backwardAStar(agent_initial_cell, target_cell, gridworld, tie):
+
+    while (1):
+        path = computePath(target_cell, agent_initial_cell, gridworld)
+
+        if path is None:
+            print("no path")
+            return
+
+        agent_initial_cell = path[len(path) - 1]
+        print("new start ", agent_initial_cell.x, agent_initial_cell.y)
+        if agent_initial_cell.x == target_cell.x and agent_initial_cell.y == target_cell.y:
+            break
+
+
 def get_shortest_path(a_x, a_y, t_x, t_y, gridworld):
     '''start = gridworld[a_y][a_x]
     goal = gridworld[t_y][t_x]
@@ -285,8 +301,10 @@ def create_maze():
                 pygame.time.delay(5000)
 
         if count1 == 0:
-            forwardAStar(agent_initial_cell, target_cell, gridworld, True)
+            backwardAStar(agent_initial_cell, target_cell, gridworld, True)
+            #forwardAStar(agent_initial_cell, target_cell, gridworld, True)
             count1 = 1;
+
         pygame.display.flip()
         pygame.time.delay(10)
         clock.tick(30)
