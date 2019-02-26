@@ -26,17 +26,19 @@ def forwardAStar(agent_initial_coord, target_coord, gridworld, tie):
     openlist = []
     closedlist = []
     start_cell = gridworld[agent_initial_coord[0]][agent_initial_coord[1]]
+    start_cell.set_g_value(agent_initial_coord)
 
     heap.heappush(openlist, (start_cell.get_f_value(), start_cell))
 
     while len(openlist) > 0:
 
-        current_cell = heap.heappop(openlist)[1]
-
+        current_cell_tuple = heap.heappop(openlist)
+        current_cell = current_cell_tuple[1]
         pygame.draw.rect(screen, BLUE, (current_cell.get_x(), current_cell.get_y(), WIDTH, WIDTH))
 
         heap.heappush(closedlist, current_cell)
         current_cell.set_visited(True)
+        current_cell.set_g_value(current_cell.get_coordinate())
 
         if current_cell.get_x() == target_coord[0] and current_cell.get_y() == target_coord[1]:
             return closedlist
@@ -48,6 +50,7 @@ def forwardAStar(agent_initial_coord, target_coord, gridworld, tie):
         # Get all neighbors for current cell
         neighbors = [gridworld[x[1]][x[0]] for x in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)] if
                      x[0] >= 0 and x[1] >= 0 and x[0] < len(gridworld) and x[1] < len(gridworld[0])]
+        # Add neighbors to open list
 
         # Set neighbors list for that cell
         current_cell.set_neighbors(neighbors)
@@ -234,9 +237,7 @@ def create_maze(agent, target):
                     for x in range(num_cols):
                         agent_coord = agent[0]/WIDTH, agent[1]/WIDTH
                         target_coord = target[0]/WIDTH, target[0]/WIDTH
-                        gridworld[y][x].set_g_value(agent_coord)
                         gridworld[y][x].set_h_value(target_coord)
-                        gridworld[y][x].update_f_value()
 
                 count = 1
 
