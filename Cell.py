@@ -145,15 +145,20 @@ class Cell():
         # Return neighbor with the smallest f value
         minNeighbor = self.neighbors[0]
         for n in self.neighbors:
-            if n.get_f_value() < minNeighbor.get_f_value():
-                if n.get_f_value == minNeighbor.get_f_value():
-                    # Tie Break
-                    if tie:  # use gval
-                        pass
-                    else:  # use hval
-                        pass
-                else:
-                    minNeighbor = n
+            if not n.get_is_blocked():
+                if n.get_f_value() < minNeighbor.get_f_value():
+                    if n.get_f_value == minNeighbor.get_f_value():
+                        # Tie Break
+                        if tie:  # use gval
+                            if n.get_g_value < minNeighbor.get_g_value:
+                                minNeighbor = n
+                            #pass
+                        else:  # use hval
+                            if n.get_h_value < minNeighbor.get_h_value:
+                                minNeighbor = n
+                            #pass
+                    else:
+                        minNeighbor = n
         return minNeighbor
 
 
