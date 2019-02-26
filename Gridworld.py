@@ -38,17 +38,18 @@ def forwardAStar(agent_initial_coord, target_coord, gridworld, tie):
 
         heap.heappush(closedlist, current_cell)
         current_cell.set_visited(True)
-        current_cell.set_g_value(current_cell.get_coordinate())
+        current_coord = current_cell.get_coordinate()
+        current_cell.set_g_value(5,3)
 
         if current_cell.get_x() == target_coord[0] and current_cell.get_y() == target_coord[1]:
-            return closedlist
+            return getShortestPath(agent_initial_coord, target_coord, gridworld), closedlist
 
         # Look at neighbors neighbors
         i = current_cell.get_x()
         j = current_cell.get_y()
 
         # Get all neighbors for current cell
-        neighbors = [gridworld[x[1]][x[0]] for x in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)] if
+        neighbors = [gridworld[x[0]][x[1]] for x in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)] if
                      x[0] >= 0 and x[1] >= 0 and x[0] < len(gridworld) and x[1] < len(gridworld[0])]
         # Add neighbors to open list
 
@@ -58,13 +59,24 @@ def forwardAStar(agent_initial_coord, target_coord, gridworld, tie):
         # Add all unblocked neighbors to open list
         updated_neighbors = current_cell.get_neighbors()
         for n in updated_neighbors:
-            if not n.get_is_blocked:
-                heap.heappush(openlist, n)
+            if not n.get_is_blocked():
+                heap.heappush(openlist, (n.get_f_value(), n))
 
-        # TODO: Implement cell parent value
         # Take neighbor with smallest f value and add to open list
         next_cell = current_cell.get_best_neighbor(tie)
+        next_cell.set_parent(current_cell.get_coordinate)
 
+
+def getShortestPath(agent_initial_coord, target_coord, gridworld):
+    ptr= gridworld[target_coord[0]][target_coord[1]]
+    path = [gridworld[target_coord[0]][target_coord[1]]]
+    while True:
+        ptr = ptr.get_parent()
+        path.append(ptr)
+        if ptr == gridworld[agent_initial_coord[0]][agent_initial_coord[1]]:
+            break
+        # ptr.state='path'
+    return path
 
 
 def pick_next_cell(curr_cell, target_cell, width):
@@ -240,11 +252,11 @@ def create_maze(agent, target):
                 target = targetCell.get_row(), targetCell.get_column()
                 print(target)
 
-                for y in range(num_rows):
-                    for x in range(num_cols):
+                for x in range(num_rows):
+                    for y in range(num_cols):
                         agent_coord = agent[0]/WIDTH, agent[1]/WIDTH
                         target_coord = target[0]/WIDTH, target[0]/WIDTH
-                        gridworld[y][x].set_h_value(target_coord)
+                        gridworld[x][y].set_h_value(target_coord)
 
                 count = 1
 

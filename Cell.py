@@ -6,8 +6,8 @@ class Cell():
         self.row = row * width
         self.col = col * width
 
-        self.x = row
-        self.y = col
+        self.x = col
+        self.y = row
 
         self.visited = False
         self.current = False
@@ -28,7 +28,7 @@ class Cell():
         self.bottom = 0
         self.left = 0
 
-        self.next_cell = 0
+        self.parent = ()
 
     def set_top(self, top):
         self.top = top
@@ -69,8 +69,8 @@ class Cell():
     def set_is_blocked(self, is_blocked):
         self.is_blocked = is_blocked
 
-    def set_next_cell(self, cell):
-        self.next_cell = cell
+    def set_parent(self, cell):
+        self.parent = cell
 
     def set_g_value(self, agent_coordinate):
         # Pull Row and Column for agent from tuple
@@ -78,10 +78,10 @@ class Cell():
         agent_column = agent_coordinate[1]
 
         # Calculate Manhattan Distance for current cell
-        manhattan_distance = abs(agent_row - self.row) + abs(agent_column - self.col)
+        manhattan_distance = abs(agent_row - self.y) + abs(agent_column - self.x)
 
         self.g_value = manhattan_distance
-        self.update_f_value()
+        self.f_value = self.g_value + self.h_value
 
     def set_h_value(self, target_coordinate):
         # Pull Row and Column for target from tuple
@@ -89,15 +89,18 @@ class Cell():
         target_column = target_coordinate[1]
 
         # Calculate Manhattan Distance for current cell
-        manhattan_distance = abs(target_row - self.row) + abs(target_column - self.col)
+        manhattan_distance = abs(target_row - self.x) + abs(target_column - self.y)
 
         self.h_value = manhattan_distance
 
     def update_f_value(self):
         self.f_value = self.g_value + self.h_value
 
+    def __lt__(self, other):
+        return self.get_f_value() < other.get_f_value()
+
     def get_coordinate(self):
-        return self.row, self.col
+        return self.x, self.y
 
     def get_visited(self):
         return self.visited
@@ -130,8 +133,8 @@ class Cell():
     def get_neighbor(self, i):
         return self.neighbors[i]
 
-    def get_next_cell(self):
-        return self.next_cell
+    def get_parent(self):
+        return self.parent
 
     def get_top(self):
         return self.top
