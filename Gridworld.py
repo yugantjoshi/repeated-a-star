@@ -28,7 +28,7 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
         current_cell_tuple = heap.heappop(openlist)
         current_cell = current_cell_tuple[1]
 
-        pygame.draw.rect(screen, BLUE, (current_cell.x * width, current_cell.y * width, width, width))
+        #pygame.draw.rect(screen, BLUE, (current_cell.x * width, current_cell.y * width, width, width))
 
         heap.heappush(closedlist, current_cell_tuple)
         current_cell.visited = True
@@ -36,6 +36,7 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
         # Reached target, return shortest path list
         if current_cell.x == target_cell.x and current_cell.y == target_cell.y:
+            print(closedlist)
             return get_shortest_path(agent_initial_cell.x, agent_initial_cell.y, target_cell.x, target_cell.y, gridworld), closedlist
 
         i = current_cell.x
@@ -51,15 +52,31 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
         # Add all unblocked neighbors to open list
         updated_neighbors = current_cell.neighbors
         for n in updated_neighbors:
-            if not n.blocked:
+            if not n.visited and not n.blocked:
                 heap.heappush(openlist, (n.f, n))
 
         next_cell = current_cell.get_best_neighbor(tie)
+        if next_cell.x != target_cell.x and next_cell.y != target_cell.y:
+            pygame.draw.rect(screen, BLUE, (next_cell.x * width, next_cell.y * width, width, width))
+            pygame.display.flip()
         next_cell.parent = (current_cell.x, current_cell.y)
 
 
 
 def get_shortest_path(a_x, a_y, t_x, t_y, gridworld):
+    '''start = gridworld[a_y][a_x]
+    goal = gridworld[t_y][t_x]
+
+    ptr = goal
+    path = [goal]
+    while True:
+        ptr = ptr.parent
+        #ptr = gridworld[ptr[0]][ptr[1]]
+        path.append(ptr)
+        if ptr == start:
+            break
+        #ptr.state = 'path'
+    return path'''
     pass
 
 def draw_cell(cell):
@@ -83,11 +100,11 @@ def create_maze():
     gridworld = []
 
     #  Create grid of cells
-    for y in range(num_rows):
+    for x in range(num_rows):
         gridworld.append([])
-        for x in range(num_cols):
+        for y in range(num_cols):
             cell = Cell(x, y)
-            gridworld[y].append(cell)
+            gridworld[x].append(cell)
 
     global current_cell
     current_cell = gridworld[0][0]
@@ -116,11 +133,21 @@ def create_maze():
         if len(stack) == 0:
             if count == 0:
                 global agent_initial_cell
+
                 agent_initial_cell = rand.choice(rand.choice(gridworld))
+
+                while agent_initial_cell.blocked:
+                    agent_initial_cell = rand.choice(rand.choice(gridworld))
+
                 pygame.draw.rect(screen, GREEN, (agent_initial_cell.x*width, agent_initial_cell.y*width, width, width))
 
                 global target_cell
+
                 target_cell = rand.choice(rand.choice(gridworld))
+
+                while target_cell.blocked:
+                    target_cell = rand.choice(rand.choice(gridworld))
+
                 pygame.draw.rect(screen, RED, (target_cell.x*width, target_cell.y*width, width, width))
 
                 for x in range(num_rows):
@@ -132,12 +159,19 @@ def create_maze():
 
     current_cell = agent_initial_cell
 
+    count1 = 0
+
     while not done:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 done = True
+        for e in pygame.event.get():
+            if e.type == pygame.KEYDOWN:
+                pygame.time.delay(5000)
 
-        forwardAStar(agent_initial_cell, target_cell, gridworld, True)
+        if count1 == 0:
+            forwardAStar(agent_initial_cell, target_cell, gridworld, True)
+            count1 = 1;
         pygame.display.flip()
         pygame.time.delay(10)
         clock.tick(30)

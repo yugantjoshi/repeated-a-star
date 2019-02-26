@@ -18,6 +18,7 @@ class Cell:
         self.neighbors = neighbors
         for n in neighbors:
             n.g = n.g+1
+            n.f = n.g + n.h
 
     def set_g_value(self, a_x, a_y):
         self.g = abs(a_x - self.x) + abs(a_y - self.y)
@@ -36,7 +37,7 @@ class Cell:
         minN = self.neighbors[0]
 
         for n in self.neighbors:
-            if not n.visited:
+            if not n.visited and not n.blocked:
                 if n.f < minN.f:
                     if n.f == minN.f:
                         # Tie Break
