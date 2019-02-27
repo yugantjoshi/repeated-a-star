@@ -27,6 +27,7 @@ class Cell:
 
     def set_h_value(self, t_x, t_y):
         self.h = abs(t_x - self.x) + abs(t_y - self.y)
+        self.f = self.g + self.h
 
     def __lt__(self, other):
         return self.f < other.f

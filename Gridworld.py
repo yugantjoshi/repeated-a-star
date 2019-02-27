@@ -15,7 +15,8 @@ PURPLE = (187,76,255)
 
 screen_size = (808, 808)
 width = 8
-screen = pygame.display.set_mode(screen_size)
+screen_1 = pygame.display.set_mode(screen_size)
+screen_2 = pygame.display.set_mode(screen_size)
 
 # gets a potential path from compute path (thru cell.parent)
 # constructs path until the first unblocked and resets the start position of agent
@@ -43,7 +44,7 @@ def constructPath(start_cell, target_cell):
             unblocked.append(curr_cell)
             curr_cell.visited = True
             if curr_cell != start_cell and curr_cell != target_cell:
-                pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
+                pygame.draw.rect(screen_1, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
                 #pygame.display.flip()
         else:
             break
@@ -55,7 +56,7 @@ def constructPath(start_cell, target_cell):
 # starting with the start_state of the agent, it adds smallest-f cell to the path
 # with that cell it computes the rest of the path
 # until it reaches goal, where it actually constructs the path
-def computePath(start_cell, target_cell, gridworld, tie):
+def computePathForward(start_cell, target_cell, gridworld, tie):
 
     print("ENTERED COMPUTE PATH")
     print(start_cell.x, start_cell.y)
@@ -147,7 +148,7 @@ def computePath(start_cell, target_cell, gridworld, tie):
 
             cell.discovered = True
             if cell != start_cell and cell != target_cell:
-                pygame.draw.rect(screen, PURPLE, (cell.x * width, cell.y * width, width, width))
+                pygame.draw.rect(screen_1, PURPLE, (cell.x * width, cell.y * width, width, width))
             #print(cell.x, cell.y)
             #print(open_list)
             cell.parent = curr_cell
@@ -156,11 +157,115 @@ def computePath(start_cell, target_cell, gridworld, tie):
     return None
 
 
+# essentially, we are getting the shortest path to target in this
+# starting with the start_state of the agent, it adds smallest-f cell to the path
+# with that cell it computes the rest of the path
+# until it reaches goal, where it actually constructs the path
+def computePathBackward(start_cell, target_cell, gridworld, tie):
+
+    print("ENTERED COMPUTE PATH")
+    print(start_cell.x, start_cell.y)
+    print(target_cell.x, target_cell.y)
+    closed_list = []
+    open_list = []
+    target_cell.h = 0
+    heapq.heappush(open_list, (target_cell.f, target_cell))
+
+    while(len(open_list) > 0):
+
+        curr_cell_tuple = heapq.heappop(open_list)
+        curr_cell = curr_cell_tuple[1]
+        #print(curr_cell.x, curr_cell.y)
+
+
+        # goal reached by travelling through unexplored cells as well
+        # get_path is going to take care of the blocked cells in the path
+        if(curr_cell.x == start_cell.x and curr_cell.y == start_cell.y):
+            print("start", start_cell.x, start_cell.y)
+            print("target", target_cell.x, target_cell.y)
+            print("parent", curr_cell.parent.x, curr_cell.parent.y)
+            return constructPath(target_cell, curr_cell)
+
+        closed_list.append(curr_cell)
+
+        i = curr_cell.x
+        j = curr_cell.y
+        # Calculate all neighbors
+        neighbors = []
+        if(i > 0):
+            neighbors.append(gridworld[i-1][j])
+        if(i < (len(gridworld[0]) - 2)):
+            neighbors.append(gridworld[i+1][j])
+        if(j > 0):
+            neighbors.append(gridworld[i][j-1])
+        if(j < (len(gridworld[0]) - 2)):
+            neighbors.append(gridworld[i][j+1])
+
+        for neighbor in neighbors:
+            print("neighbor:", neighbor.x, neighbor.y)
+
+        # Set neighbors list for that cell
+        curr_cell.set_neighbors(neighbors)
+        neighbors = curr_cell.neighbors
+        print(curr_cell.x, curr_cell.y)
+
+        # adding the states to open_list
+        for cell in neighbors:
+            #if cell.visited:
+             #   continue
+            if cell in closed_list:
+                continue
+            if cell.discovered or cell.blocked:
+                continue
+
+            # update value if already exists in open_list
+            for cell_tuple in open_list:
+                if cell_tuple[1].x == cell.x and cell_tuple[1].y == cell.y:
+                    open_list.remove(cell_tuple)
+                    heapq.heapify(open_list)
+                    break
+
+            if len(open_list) != 0:
+                minGval = heapq.heappop(open_list)
+                minGval = minGval[1]
+
+                if cell.f == minGval.f:
+                    # Tie Break
+                    if tie:  # Use small g
+                        if cell.h < minGval.h:
+                            heapq.heappush(open_list, (minGval.f, minGval))
+                            minGval = cell
+                            heapq.heappush(open_list, (minGval.f, minGval))
+                        else:
+                            heapq.heappush(open_list, (minGval.f, minGval))
+                            heapq.heappush(open_list, (cell.f, cell))
+                    else:  # Use Large g
+                        '''if cell.h < minGval.h:
+                            heapq.heappush(open_list, (minGval.f, minGval))
+                            minGval = cell
+                            heapq.heappush(open_list, (minGval.f, minGval))'''
+
+                else:
+                    heapq.heappush(open_list, (minGval.f, minGval))
+                    heapq.heappush(open_list,(cell.f, cell))
+            else:
+                heapq.heappush(open_list, (cell.f, cell))
+
+            cell.discovered = True
+            if cell != start_cell and cell != target_cell:
+                pygame.draw.rect(screen_1, PURPLE, (cell.x * width, cell.y * width, width, width))
+            #print(cell.x, cell.y)
+            #print(open_list)
+            cell.parent = curr_cell
+            #print("parent ", cell.parent.x, cell.parent.y)
+
+    return None
+
 def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
     start_state = agent_initial_cell
     while(1):
-        path = computePath(start_state, target_cell, gridworld, tie)
+        path = computePathForward(start_state, target_cell, gridworld, tie)
 
         if path is None:
             print("no path")
@@ -184,7 +289,7 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 def backwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
     while (1):
-        path = computePath(target_cell, agent_initial_cell, gridworld, tie)
+        path = computePathBackward(agent_initial_cell, target_cell, gridworld, tie)
 
         if path is None:
             print("no path")
@@ -195,12 +300,14 @@ def backwardAStar(agent_initial_cell, target_cell, gridworld, tie):
         if agent_initial_cell.x == target_cell.x and agent_initial_cell.y == target_cell.y:
             break
 
+#def adaptiveAStar():
+
 
 def draw_cell(cell):
     if cell.blocked:
-        pygame.draw.rect(screen, BLACK, (cell.x * width, cell.y * width, width, width))
+        pygame.draw.rect(screen_1, BLACK, (cell.x * width, cell.y * width, width, width))
     else:
-        pygame.draw.rect(screen, WHITE, (cell.x * width, cell.y * width, width, width))
+        pygame.draw.rect(screen_1, WHITE, (cell.x * width, cell.y * width, width, width))
 
 
 def create_maze():
@@ -211,7 +318,6 @@ def create_maze():
 
     global stack
     stack = []
-    global gridworld
     gridworld = []
 
     #  Create grid of cells
@@ -253,9 +359,6 @@ def create_maze():
 
 def create_agent_target(gridworld):
 
-    num_rows = int(screen_size[0] / width)
-    num_cols = int(screen_size[1] / width)
-
     global agent_initial_cell
 
     agent_initial_cell = rand.choice(rand.choice(gridworld))
@@ -268,7 +371,7 @@ def create_agent_target(gridworld):
         ######
         #agent_initial_cell.x = 0
 
-    pygame.draw.rect(screen, GREEN, (agent_initial_cell.x * width, agent_initial_cell.y * width, width, width))
+    pygame.draw.rect(screen_1, GREEN, (agent_initial_cell.x * width, agent_initial_cell.y * width, width, width))
 
     global target_cell
 
@@ -282,15 +385,11 @@ def create_agent_target(gridworld):
         ########
         #target_cell.x = num_cols - 1
         # target_cell.y = num_rows - 5
-    pygame.draw.rect(screen, RED, (target_cell.x * width, target_cell.y * width, width, width))
-
-    for x in range(num_rows):
-        for y in range(num_cols):
-            gridworld[x][y].set_h_value(target_cell.x, target_cell.y)
+    pygame.draw.rect(screen_1, RED, (target_cell.x * width, target_cell.y * width, width, width))
 
     return (agent_initial_cell, target_cell)
 
-def start_game(agent_initial_cell, target_cell, gridworld):
+def start_game(agent_initial_cell, target_cell, gridworld, forward_backward):
     done = False
     clock = pygame.time.Clock()
     count1 = 0
@@ -306,16 +405,61 @@ def start_game(agent_initial_cell, target_cell, gridworld):
                 pygame.time.delay(5000)
 
         if count1 == 0:
-            forwardAStar(agent_initial_cell, target_cell, gridworld, True)
-            #backwardAStar(agent_initial_cell, target_cell, gridworld, True)
+            if forward_backward:
+
+                forwardAStar(agent_initial_cell, target_cell, gridworld, True)
+
+            else:
+                backwardAStar(agent_initial_cell, target_cell, gridworld, True)
+
             count1 = 1
+
         pygame.display.flip()
         pygame.time.delay(10)
         clock.tick(30)
 
+def set_hg_in_maze(generated_maze, hVal):
+
+    if hVal:
+        num_rows = int(screen_size[0] / width)
+        num_cols = int(screen_size[1] / width)
+
+        for x in range(num_rows):
+            for y in range(num_cols):
+                generated_maze[x][y].set_h_value(target_cell.x, target_cell.y)
+
+    else:
+        num_rows = int(screen_size[0] / width)
+        num_cols = int(screen_size[1] / width)
+
+        for x in range(num_rows):
+            for y in range(num_cols):
+                generated_maze[x][y].set_g_value(agent_initial_cell.x, agent_initial_cell.y)
+
+def reset_maze(generated_maze):
+    num_rows = int(screen_size[0] / width)
+    num_cols = int(screen_size[1] / width)
+
+    for x in range(num_rows):
+        for y in range(num_cols):
+            generated_maze[x][y].g = 0
+            generated_maze[x][y].h = 0
+            generated_maze[x][y].f = 0
+            generated_maze[x][y].discovered = False
+            generated_maze[x][y].visited = False
+            generated_maze[x][y].parent = None
+            generated_maze[x][y].neighbors = []
+
+
+
 generated_maze = create_maze()
 complete_maze = create_agent_target(generated_maze)
-start_game(complete_maze[0], complete_maze[1], generated_maze)
+set_hg_in_maze(generated_maze, True) # True to run forward A*
+start_game(complete_maze[0], complete_maze[1], generated_maze, True) # True to run forward A*
+reset_maze(generated_maze)
+set_hg_in_maze(generated_maze, False) # False to run backward A*
+start_game(complete_maze[0], complete_maze[1], generated_maze, False) # False to run backward A*
+
 #start_game(complete_maze[0], complete_maze[1], generated_maze)
 #start_game(complete_maze[0], complete_maze[1], generated_maze)
 
