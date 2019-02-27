@@ -17,8 +17,6 @@ screen_size = (808, 808)
 width = 8
 screen = pygame.display.set_mode(screen_size)
 
-open_list = []
-closed_list = []
 # gets a potential path from compute path (thru cell.parent)
 # constructs path until the first unblocked and resets the start position of agent
 # colors the path taken
@@ -87,12 +85,23 @@ def computePath(start_cell, target_cell, gridworld, tie):
         i = curr_cell.x
         j = curr_cell.y
         # Calculate all neighbors
-        neighbors = [gridworld[x[0]][x[1]] for x in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)] if
-                     x[0] >= 0 and x[1] >= 0 and x[0] < len(gridworld) and x[1] < len(gridworld[0])]
+        neighbors = []
+        if(i > 0):
+            neighbors.append(gridworld[i-1][j])
+        if(i < (len(gridworld[0]) - 2)):
+            neighbors.append(gridworld[i+1][j])
+        if(j > 0):
+            neighbors.append(gridworld[i][j-1])
+        if(j < (len(gridworld[0]) - 2)):
+            neighbors.append(gridworld[i][j+1])
+
+        for neighbor in neighbors:
+            print("neighbor:", neighbor.x, neighbor.y)
 
         # Set neighbors list for that cell
         curr_cell.set_neighbors(neighbors)
         neighbors = curr_cell.neighbors
+        print(curr_cell.x, curr_cell.y)
 
         # adding the states to open_list
         for cell in neighbors:
@@ -160,10 +169,10 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
         start_state = path[len(path)-1]
 
-        for cell in path:
-            if(cell.x != agent_initial_cell.x or cell.y != agent_initial_cell.y):
-                print("path", cell.x, cell.y)
-                print(cell.parent.x, cell.parent.y)
+        #for cell in path:
+         #   if(cell.x != agent_initial_cell.x or cell.y != agent_initial_cell.y):
+                #print("path", cell.x, cell.y)
+                #print(cell.parent.x, cell.parent.y)
 
         print("new start ", start_state.x, start_state.y)
         if start_state.x == target_cell.x and start_state.y == target_cell.y:
