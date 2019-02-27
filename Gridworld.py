@@ -13,7 +13,7 @@ GREEN = (0,250,154)
 BLUE = (0,191,255)
 
 screen_size = (707, 707)
-width = 50
+width = 7
 screen = pygame.display.set_mode(screen_size)
 
 open_list = []
@@ -27,26 +27,24 @@ def constructPath(start_cell, target_cell):
     path = []
 
     path.append(target_cell)
-    path.reverse()
     curr_cell = target_cell.parent
-    print("target parent", curr_cell.x, curr_cell.y)
+    #print("target parent", curr_cell.x, curr_cell.y)
     while curr_cell is not start_cell:
-        print("parent", curr_cell.x, curr_cell.y)
+        #print("parent", curr_cell.x, curr_cell.y)
         path.append(curr_cell)
         curr_cell = curr_cell.parent
 
     path.append(start_cell)
 
-    print(path)
+    #print(path)
     unblocked = []
 
-    for curr_cell in path:
+    for curr_cell in reversed(path):
         if not curr_cell.blocked:
             unblocked.append(curr_cell)
             curr_cell.visited = True
-            if curr_cell != start_cell and curr_cell != target_cell:
-                pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
-                pygame.display.update()
+            pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
+            pygame.display.flip()
         else:
             break
 
@@ -59,6 +57,7 @@ def constructPath(start_cell, target_cell):
 # until it reaches goal, where it actually constructs the path
 def computePath(start_cell, target_cell, gridworld):
 
+    print("ENTERED COMPUTE PATH")
     print(start_cell.x, start_cell.y)
     print(target_cell.x, target_cell.y)
     closed_list = []
@@ -70,7 +69,7 @@ def computePath(start_cell, target_cell, gridworld):
 
         curr_cell_tuple = heapq.heappop(open_list)
         curr_cell = curr_cell_tuple[1]
-        print(curr_cell.x, curr_cell.y)
+        #print(curr_cell.x, curr_cell.y)
 
 
         # goal reached by travelling through unexplored cells as well
@@ -109,10 +108,10 @@ def computePath(start_cell, target_cell, gridworld):
 
             heapq.heappush(open_list,(cell.f, cell))
 
-            print(cell.x, cell.y)
+            #print(cell.x, cell.y)
             #print(open_list)
             cell.parent = curr_cell
-            print("parent ", cell.parent.x, cell.parent.y)
+            #print("parent ", cell.parent.x, cell.parent.y)
 
     return None
 
@@ -128,10 +127,15 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
 
         agent_initial_cell = path[len(path)-1]
+
+        for cell in path:
+            print("path", cell.x, cell.y)
+
         print("new start ", agent_initial_cell.x, agent_initial_cell.y)
         if agent_initial_cell.x == target_cell.x and agent_initial_cell.y == target_cell.y:
             break
 
+    return
     """
     # True tie means prefer gval, False means prefer hval
     openlist = []
@@ -193,22 +197,6 @@ def backwardAStar(agent_initial_cell, target_cell, gridworld, tie):
         if agent_initial_cell.x == target_cell.x and agent_initial_cell.y == target_cell.y:
             break
 
-
-def get_shortest_path(a_x, a_y, t_x, t_y, gridworld):
-    '''start = gridworld[a_y][a_x]
-    goal = gridworld[t_y][t_x]
-
-    ptr = goal
-    path = [goal]
-    while True:
-        ptr = ptr.parent
-        #ptr = gridworld[ptr[0]][ptr[1]]
-        path.append(ptr)
-        if ptr == start:
-            break
-        #ptr.state = 'path'
-    return path'''
-    pass
 
 def draw_cell(cell):
     if cell.blocked:
@@ -301,10 +289,8 @@ def create_maze():
                 pygame.time.delay(5000)
 
         if count1 == 0:
-            backwardAStar(agent_initial_cell, target_cell, gridworld, True)
-            #forwardAStar(agent_initial_cell, target_cell, gridworld, True)
+            forwardAStar(agent_initial_cell, target_cell, gridworld, True)
             count1 = 1;
-
         pygame.display.flip()
         pygame.time.delay(10)
         clock.tick(30)
