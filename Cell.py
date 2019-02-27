@@ -52,3 +52,16 @@ class Cell:
                     else:
                         minN = n
         return minN
+
+    def reset_cell(self):
+
+        self.blocked = False
+        self.visited = False
+        self.discovered = False
+
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+        self.neighbors = []
+        self.parent = None
