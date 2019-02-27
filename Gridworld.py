@@ -28,15 +28,12 @@ def constructPath(start_cell, target_cell):
 
     path.append(target_cell)
     curr_cell = target_cell.parent
-    #print("target parent", curr_cell.x, curr_cell.y)
     while curr_cell is not start_cell:
-        #print("parent", curr_cell.x, curr_cell.y)
         path.append(curr_cell)
         curr_cell = curr_cell.parent
 
     path.append(start_cell)
 
-    #print(path)
     unblocked = []
 
     for curr_cell in reversed(path):
@@ -45,7 +42,6 @@ def constructPath(start_cell, target_cell):
             curr_cell.visited = True
             if curr_cell != start_cell and curr_cell != target_cell:
                 pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
-                #pygame.display.flip()
         else:
             break
 
@@ -67,7 +63,6 @@ def computePathForward(start_cell, target_cell, gridworld, tie):
 
         curr_cell_tuple = heapq.heappop(open_list)
         curr_cell = curr_cell_tuple[1]
-        #print(curr_cell.x, curr_cell.y)
 
 
         # goal reached by travelling through unexplored cells as well
@@ -140,10 +135,7 @@ def computePathForward(start_cell, target_cell, gridworld, tie):
             if cell != start_cell and cell != target_cell:
                 discovered_nodes_count += 1
                 pygame.draw.rect(screen, PURPLE, (cell.x * width, cell.y * width, width, width))
-            #print(cell.x, cell.y)
-            #print(open_list)
             cell.parent = curr_cell
-            #print("parent ", cell.parent.x, cell.parent.y)
 
     return None
 
@@ -154,8 +146,6 @@ def computePathForward(start_cell, target_cell, gridworld, tie):
 # until it reaches goal, where it actually constructs the path
 def computePathBackward(start_cell, target_cell, gridworld, tie):
 
-    print(start_cell.x, start_cell.y)
-    print(target_cell.x, target_cell.y)
     closed_list = []
     open_list = []
     target_cell.h = 0
@@ -165,15 +155,11 @@ def computePathBackward(start_cell, target_cell, gridworld, tie):
 
         curr_cell_tuple = heapq.heappop(open_list)
         curr_cell = curr_cell_tuple[1]
-        #print(curr_cell.x, curr_cell.y)
 
 
         # goal reached by travelling through unexplored cells as well
         # get_path is going to take care of the blocked cells in the path
         if(curr_cell.x == start_cell.x and curr_cell.y == start_cell.y):
-            print("start", start_cell.x, start_cell.y)
-            print("target", target_cell.x, target_cell.y)
-            print("parent", curr_cell.parent.x, curr_cell.parent.y)
             return constructPath(target_cell, curr_cell)
 
         closed_list.append(curr_cell)
@@ -191,13 +177,9 @@ def computePathBackward(start_cell, target_cell, gridworld, tie):
         if(j < (len(gridworld[0]) - 2)):
             neighbors.append(gridworld[i][j+1])
 
-        for neighbor in neighbors:
-            print("neighbor:", neighbor.x, neighbor.y)
-
         # Set neighbors list for that cell
         curr_cell.set_neighbors(neighbors)
         neighbors = curr_cell.neighbors
-        print(curr_cell.x, curr_cell.y)
 
         # adding the states to open_list
         for cell in neighbors:
@@ -244,11 +226,7 @@ def computePathBackward(start_cell, target_cell, gridworld, tie):
             cell.discovered = True
             if cell != start_cell and cell != target_cell:
                 pygame.draw.rect(screen, PURPLE, (cell.x * width, cell.y * width, width, width))
-            #print(cell.x, cell.y)
-            #print(open_list)
             cell.parent = curr_cell
-            #print("parent ", cell.parent.x, cell.parent.y)
-
     return None
 
 def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
@@ -260,14 +238,7 @@ def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
         if path is None:
             print("no path")
             return
-
-
         start_state = path[len(path)-1]
-
-        #for cell in path:
-         #   if(cell.x != agent_initial_cell.x or cell.y != agent_initial_cell.y):
-                #print("path", cell.x, cell.y)
-                #print(cell.parent.x, cell.parent.y)
 
         if start_state.x == target_cell.x and start_state.y == target_cell.y:
             break
