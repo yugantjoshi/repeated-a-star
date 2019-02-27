@@ -12,8 +12,8 @@ RED = (255,0,00)
 GREEN = (0,250,154)
 BLUE = (0,191,255)
 
-screen_size = (707, 707)
-width = 7
+screen_size = (808, 808)
+width = 8
 screen = pygame.display.set_mode(screen_size)
 
 open_list = []
@@ -43,8 +43,9 @@ def constructPath(start_cell, target_cell):
         if not curr_cell.blocked:
             unblocked.append(curr_cell)
             curr_cell.visited = True
-            pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
-            pygame.display.flip()
+            if curr_cell != start_cell and curr_cell != target_cell:
+                pygame.draw.rect(screen, BLUE, (curr_cell.x * width, curr_cell.y * width, width, width))
+                pygame.display.update()
         else:
             break
 
@@ -94,20 +95,22 @@ def computePath(start_cell, target_cell, gridworld):
 
         # adding the states to open_list
         for cell in neighbors:
-            if cell.blocked or cell.visited:
-                continue
+            #if cell.visited:
+             #   continue
             if cell in closed_list:
+                continue
+            if cell.discovered and cell.blocked:
                 continue
 
             # update value if already exists in open_list
             for cell_tuple in open_list:
-                if cell_tuple[1] is cell:
+                if cell_tuple[1].x == cell.x and cell_tuple[1].y == cell.y:
                     open_list.remove(cell_tuple)
                     heapq.heapify(open_list)
                     break
 
             heapq.heappush(open_list,(cell.f, cell))
-
+            cell.discovered = True
             #print(cell.x, cell.y)
             #print(open_list)
             cell.parent = curr_cell
@@ -118,21 +121,24 @@ def computePath(start_cell, target_cell, gridworld):
 
 def forwardAStar(agent_initial_cell, target_cell, gridworld, tie):
 
+    start_state = agent_initial_cell
     while(1):
-        path = computePath(agent_initial_cell, target_cell, gridworld)
+        path = computePath(start_state, target_cell, gridworld)
 
         if path is None:
             print("no path")
             return
 
 
-        agent_initial_cell = path[len(path)-1]
+        start_state = path[len(path)-1]
 
         for cell in path:
-            print("path", cell.x, cell.y)
+            if(cell.x != agent_initial_cell.x or cell.y != agent_initial_cell.y):
+                print("path", cell.x, cell.y)
+                print(cell.parent.x, cell.parent.y)
 
-        print("new start ", agent_initial_cell.x, agent_initial_cell.y)
-        if agent_initial_cell.x == target_cell.x and agent_initial_cell.y == target_cell.y:
+        print("new start ", start_state.x, start_state.y)
+        if start_state.x == target_cell.x and start_state.y == target_cell.y:
             break
 
     return
@@ -254,19 +260,27 @@ def create_maze():
                 global agent_initial_cell
 
                 agent_initial_cell = rand.choice(rand.choice(gridworld))
+                #########
+                agent_initial_cell.x = 0
 
                 while agent_initial_cell.blocked:
                     agent_initial_cell = rand.choice(rand.choice(gridworld))
+                    ######
+                    agent_initial_cell.x = 0
 
                 pygame.draw.rect(screen, GREEN, (agent_initial_cell.x*width, agent_initial_cell.y*width, width, width))
 
                 global target_cell
 
                 target_cell = rand.choice(rand.choice(gridworld))
+                ########
+                target_cell.x = num_cols - 1
 
                 while target_cell.blocked:
                     target_cell = rand.choice(rand.choice(gridworld))
-
+                    ########
+                    target_cell.x = num_cols - 1
+                    target_cell.y = num_rows - 5
                 pygame.draw.rect(screen, RED, (target_cell.x*width, target_cell.y*width, width, width))
 
                 for x in range(num_rows):

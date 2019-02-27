@@ -6,6 +6,7 @@ class Cell:
 
         self.blocked = False
         self.visited = False
+        self.discovered = False
 
         self.g = 0
         self.h = 0
