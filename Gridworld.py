@@ -356,7 +356,7 @@ def start_game(agent_initial_cell, target_cell, gridworld, forward_backward, gri
     count1 = 0
 
     while not done:
-        for e in pygame.event.get():
+        '''for e in pygame.event.get():
             if e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_SPACE:
                     if forward_backward:
@@ -366,7 +366,7 @@ def start_game(agent_initial_cell, target_cell, gridworld, forward_backward, gri
                     done = True
             if e.type == pygame.QUIT:
                 done = True
-                break
+                break'''
 
         if count1 == 0:
             if forward_backward:
@@ -375,14 +375,20 @@ def start_game(agent_initial_cell, target_cell, gridworld, forward_backward, gri
                 backwardAStar(agent_initial_cell, target_cell, gridworld, True)
             if forward_backward:
                 print("Discovered: %d nodes in Forward A*" % discovered_nodes_count)
+                pygame.image.save(screen, "Forward_Grid_%d.jpeg" % gridcount)
+
                 f_forward = open("Log_Forward_A_Star.txt", "a+")
                 f_forward.write("Forward A* Discovered: %d\r\n" % discovered_nodes_count)
                 f_forward.close()
+                done = True
             else:
                 print("Discovered: %d nodes in Backward A*" % discovered_nodes_count)
+                pygame.image.save(screen, "Backward_Grid_%d.jpeg" % gridcount)
+
                 f_backward = open("Log_Backward_A_Star.txt", "a+")
                 f_backward.write("Backward A* Discovered: %d\r\n" % discovered_nodes_count)
                 f_backward.close()
+                done = True
 
             count1 = 1
         pygame.display.flip()
