@@ -17,7 +17,7 @@ screen_size = (808, 808)
 width = 8
 screen = pygame.display.set_mode(screen_size)
 
-discovered_nodes_count = 0
+global discovered_nodes_count
 
 
 # gets a potential path from compute path (thru cell.parent)
@@ -145,7 +145,7 @@ def computePathForward(start_cell, target_cell, gridworld, tie):
 # with that cell it computes the rest of the path
 # until it reaches goal, where it actually constructs the path
 def computePathBackward(start_cell, target_cell, gridworld, tie):
-
+    global discovered_nodes_count
     closed_list = []
     open_list = []
     target_cell.h = 0
@@ -225,6 +225,7 @@ def computePathBackward(start_cell, target_cell, gridworld, tie):
 
             cell.discovered = True
             if cell != start_cell and cell != target_cell:
+                discovered_nodes_count += 1
                 pygame.draw.rect(screen, PURPLE, (cell.x * width, cell.y * width, width, width))
             cell.parent = curr_cell
     return None
@@ -374,14 +375,14 @@ def start_game(agent_initial_cell, target_cell, gridworld, forward_backward, gri
                 backwardAStar(agent_initial_cell, target_cell, gridworld, True)
             if forward_backward:
                 print("Discovered: %d nodes in Forward A*" % discovered_nodes_count)
-                f = open("Log_Forward_A_Star.txt", "a+")
-                f.write("Forward A* Discovered: %d\r\n" % discovered_nodes_count)
-                f.close()
+                f_forward = open("Log_Forward_A_Star.txt", "a+")
+                f_forward.write("Forward A* Discovered: %d\r\n" % discovered_nodes_count)
+                f_forward.close()
             else:
                 print("Discovered: %d nodes in Backward A*" % discovered_nodes_count)
-                f = open("Log_Backward_A_Star.txt", "a+")
-                f.write("Backward A* Discovered: %d\r\n" % discovered_nodes_count)
-                f.close()
+                f_backward = open("Log_Backward_A_Star.txt", "a+")
+                f_backward.write("Backward A* Discovered: %d\r\n" % discovered_nodes_count)
+                f_backward.close()
 
             count1 = 1
         pygame.display.flip()
@@ -407,6 +408,7 @@ def set_hg_in_maze(generated_maze, hVal):
                 generated_maze[x][y].set_g_value(agent_initial_cell.x, agent_initial_cell.y)
 
 def reset_maze(generated_maze):
+    agent_initial_cell
     num_rows = int(screen_size[0] / width)
     num_cols = int(screen_size[1] / width)
 
@@ -415,6 +417,8 @@ def reset_maze(generated_maze):
             if generated_maze[x][y].discovered or generated_maze[x][y].visited:
                 generated_maze[x][y].reset_cell()
                 pygame.draw.rect(screen, WHITE, (x * width, y * width, width, width))
+    pygame.draw.rect(screen, GREEN, (agent_initial_cell.x * width, agent_initial_cell.y * width, width, width))
+    pygame.draw.rect(screen, RED, (target_cell.x * width, target_cell.y * width, width, width))
 
 
 for create_fifty in range(50):
