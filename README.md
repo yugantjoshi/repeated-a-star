@@ -1,4 +1,4 @@
-# repeated-a-star - Artificial Intelligence
+# repeated-a-star
 
 ## Three different implementations of the A* search algorithm in Python with a PyGame GUI
 
